@@ -10,36 +10,12 @@ import fr.isen.java2.db.entities.Movie;
 
 public class MovieDao {
 
-//	public List<Movie> listMovies() {
-//		List<Movie> movies = new ArrayList<>();
-//		String sqlQuery = "SELECT * FROM movie JOIN genre ON movie.genre_id = genre.idgenre";
-//		try(Connection cnx = DataSourceFactory.getDataSource().getConnection();
-//			PreparedStatement statement = cnx.prepareStatement(sqlQuery);
-//			ResultSet res = statement.executeQuery()){
-//
-//			while (res.next()){
-//				Movie movie = new Movie();
-//				movie.setId(res.getInt("idmovie"));
-//				movie.setTitle(res.getString("title"));
-////				movie.setReleaseDate(LocalDate.from(res.getTimestamp("release_date").toLocalDateTime()));
-//				if (res.getTimestamp("release_date") != null) {
-//					movie.setReleaseDate(res.getTimestamp("release_date").toLocalDateTime().toLocalDate());
-//				}
-//				movie.setDuration(res.getInt("duration"));
-//				movie.setDirector(res.getString("director"));
-//				movie.setSummary(res.getString("summary"));
-//
-//				Genre genre = new Genre(res.getInt("idgenre"), res.getString("genre_name"));
-//				movie.setGenre(genre);
-//
-//				movies.add(movie);
-//			}
-//
-//		}catch (SQLException e){
-//			throw new RuntimeException("Method is not yet implemented", e);
-//		}
-//		return movies;
-//	}
+	/**
+	 * Retrieves a list of all movies from the database.
+	 *
+	 * @return a list of Movie objects
+	 * @throws RuntimeException if there is an error while listing movies
+	 */
 
 	public List<Movie> listMovies() {
 		List<Movie> movies = new ArrayList<>();
@@ -47,32 +23,39 @@ public class MovieDao {
 
 		try (Connection connection = DataSourceFactory.getDataSource().getConnection();
 			 PreparedStatement stmt = connection.prepareStatement(sql);
-			 ResultSet rs = stmt.executeQuery()) {
+			 ResultSet res = stmt.executeQuery()) {
 
-			while (rs.next()) {
+			while (res.next()) {
 				// Create Genre object
-				Genre genre = new Genre(rs.getInt("idgenre"), rs.getString("name"));
+				Genre genre = new Genre(res.getInt("idgenre"), res.getString("name"));
 
 				// Create Movie object
 				Movie movie = new Movie(
-						rs.getInt("idmovie"),
-						rs.getString("title"),
-						rs.getTimestamp("release_date") != null ?
-								rs.getTimestamp("release_date").toLocalDateTime().toLocalDate() : null,
+						res.getInt("idmovie"),
+						res.getString("title"),
+						res.getTimestamp("release_date") != null ?
+								res.getTimestamp("release_date").toLocalDateTime().toLocalDate() : null,
 						genre,  // Pass Genre object
-						rs.getInt("duration"),
-						rs.getString("director"),
-						rs.getString("summary")
+						res.getInt("duration"),
+						res.getString("director"),
+						res.getString("summary")
 				);
 				movies.add(movie);
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new RuntimeException("Error listing movies into database", e);
 		}
 		return movies;
 	}
 
 
+	/**
+	 * Retrieves a list of all movies from the database by genre.
+	 *
+	 * @param genreName the name of the genre to retrieve
+	 * @return a list of Movie objects
+	 * @throws RuntimeException if there is an error while listing movies
+	 */
 	public List<Movie> listMoviesByGenre(String genreName) {
 		List <Movie> movies = new ArrayList<>();
 		String sqlStatement = "SELECT * FROM movie JOIN genre ON movie.genre_id = genre.idgenre WHERE genre.name = ?";
@@ -98,20 +81,27 @@ public class MovieDao {
 			}
 
 		}catch (SQLException e){
-			throw new RuntimeException("Method is not yet implemented", e);
+			throw new RuntimeException("Error listing movies by genre",e);
 		}
 		return movies;
 	}
 
 
 
+	/**
+	 * Adds a movie to the database.
+	 *
+	 * @param movie the movie to add
+	 * @return the movie object with its ID
+	 * @throws RuntimeException if there is an error while adding the movie
+	 */
 	public Movie addMovie(Movie movie) {
 		String sqlStatement = "INSERT INTO movie(title,release_date,genre_id,duration,director,summary) VALUES(?,?,?,?,?,?)";
 		try (Connection conx = DataSourceFactory.getDataSource().getConnection();
-			 PreparedStatement statement = conx.prepareStatement(sqlStatement)) {
+			 PreparedStatement statement = conx.prepareStatement(sqlStatement, PreparedStatement.RETURN_GENERATED_KEYS)) {
 			statement.setString(1, movie.getTitle());
-			statement.setDate(2, Date.valueOf(movie.getReleaseDate())); // Convert LocalDate to SQL Date
-			statement.setInt(3, movie.getGenre().getId()); // Get genre ID
+			statement.setDate(2, Date.valueOf(movie.getReleaseDate()));
+			statement.setInt(3, movie.getGenre().getId());
 			statement.setInt(4, movie.getDuration());
 			statement.setString(5, movie.getDirector());
 			statement.setString(6, movie.getSummary());
@@ -129,7 +119,7 @@ public class MovieDao {
 				}
 			}
 		} catch (SQLException e) {
-			throw new RuntimeException("Method is not yet implemented", e);
+			throw new RuntimeException("Error adding movie into database", e);
 		}
 		return movie;
 	}

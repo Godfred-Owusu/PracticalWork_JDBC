@@ -53,12 +53,16 @@ public class MovieDaoTestCase {
 		stmt.close();
 		connection.close();
 	}
-	
+
+
+	/**
+	 * Tests the listMovies method of MovieDao.
+	 */
 	 @Test
 	 public void shouldListMovies() {
-//		When
+//		WHEN
 		 List<Movie> movies = movieDao.listMovies();
-//		 Then
+//		 THEN
 		 assertThat(movies).hasSize(3);
 		 assertThat(movies).extracting("title", "releaseDate","genre.id", "duration", "director", "summary")
 				 .containsOnly(
@@ -68,10 +72,14 @@ public class MovieDaoTestCase {
 				 );
 	 }
 
+	/**
+	 * Tests the listMoviesByGenre method of MovieDao.
+	 */
 	 @Test
 	 public void shouldListMoviesByGenre() {
-//		when
+		// WHEN
 		  List<Movie> movies = movieDao.listMoviesByGenre("Drama");
+		 // THEN
 		 assertThat(movies).hasSize(1);
 		 assertThat(movies).extracting("title", "releaseDate", "duration", "director", "summary")
 				 .containsOnly(
@@ -81,6 +89,12 @@ public class MovieDaoTestCase {
 	 }
 
 
+
+	/**
+	 * Tests the addMovie method of MovieDao.
+	 *
+	 * @throws Exception if there is an error during the test
+	 */
 	 @Test
 	 public void shouldAddMovie() throws Exception {
 
