@@ -23,7 +23,7 @@ public class MovieDaoTestCase {
 	private final MovieDao movieDao = new MovieDao();
 	@BeforeEach
 	public void initDb() throws Exception {
-		Connection connection = DataSourceFactory.getDataSource().getConnection();
+		Connection connection = DataSourceFactory.getConnection();
 		Statement stmt = connection.createStatement();
 		stmt.executeUpdate(
 				"CREATE TABLE IF NOT EXISTS genre (idgenre INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT , name VARCHAR(50) NOT NULL);");
@@ -111,7 +111,7 @@ public class MovieDaoTestCase {
 		 movieDao.addMovie(movie);
 
 		 // THEN
-		 try (Connection connection = DataSourceFactory.getDataSource().getConnection();
+		 try (Connection connection = DataSourceFactory.getConnection();
 			  PreparedStatement statement = connection.prepareStatement("SELECT * FROM movie WHERE title = ?")) {
 
 			 statement.setString(1, "Test Movie");
