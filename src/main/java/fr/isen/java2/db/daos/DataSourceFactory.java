@@ -41,15 +41,16 @@ import javax.sql.DataSource;
 
 public class DataSourceFactory {
 //used postgresql with railway database instead of sqlite and refactored the code to use DriverManager instead of DataSource
-	private static final String URL = "jdbc:postgresql://monorail.proxy.rlwy.net:40851/railway";
-	private static final String USER = "postgres";
-	private static final String PASSWORD = "nSsGyGvXgCtoqlTyBXPCdXdbgytAvfHx";
+//	private static final String URL ="jdbc:sqlite:sqlite.db";
+//	private static final String USER = "postgres";
+//	private static final String PASSWORD = "nSsGyGvXgCtoqlTyBXPCdXdbgytAvfHx";
 
-	private DataSourceFactory() {
-		throw new IllegalStateException("This is a static class that should not be instantiated");
-	}
+//	private DataSourceFactory() {
+//		throw new IllegalStateException("This is a static class that should not be instantiated");
+//	}
 
 	public static Connection getConnection() throws SQLException {
-		return DriverManager.getConnection(URL, USER, PASSWORD);
+        String url = "jdbc:sqlite:sqlite.db";
+		return DriverManager.getConnection(url);
 	}
 }
